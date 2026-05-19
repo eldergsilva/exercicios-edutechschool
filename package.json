@@ -1,0 +1,27 @@
+{
+  "name": "exercicios-edutechschool",
+  "version": "1.0.0",
+  "description": "Você foi contratado pela **EduTech**, uma empresa de tecnologia educacional. Sua missão é construir uma API RESTful para um sistema de gerenciamento escolar. O projeto é um **piloto**, portanto dados da escola (nome, código, etc.) serão imutáveis por enquanto.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon ./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eldergsilva/exercicios-edutechschool.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/eldergsilva/exercicios-edutechschool/issues"
+  },
+  "homepage": "https://github.com/eldergsilva/exercicios-edutechschool#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
