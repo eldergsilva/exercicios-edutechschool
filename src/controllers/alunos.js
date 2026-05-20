@@ -44,7 +44,48 @@ const listarAlunos = (req, res) => {
     return res.status(201).json({mensagem:'Aluno criado com sucesso!'});
 };
 
+const atualizarAluno = (req, res) => {
+    const { matricula } = req.params;
+    const { nome, cpf, data_nascimento, telefone, email, senha, turma } = req.body;
+  
+    
+    if (!nome || !cpf || !data_nascimento || !telefone || !email || !senha || !turma) {
+        return res.status(400).json({ mensagem: 'Todos os campos são obrigatórios!' });
+    }
+
+    
+    const aluno = bancodedados.alunos.find((a) => String(a.matricula) === String(matricula));
+    if (!aluno) {
+        return res.status(404).json({ mensagem: 'Aluno não encontrado!' });
+    }
+
+    
+    const cpfJaCadastrado = bancodedados.alunos.some((a) => a.usuario.cpf === cpf && String(a.matricula) !== String(matricula));
+    if (cpfJaCadastrado) {
+        return res.status(400).json({ mensagem: 'O CPF informado já pertence a outro aluno!' });
+    }
+
+    
+    const emailJaCadastrado = bancodedados.alunos.some((a) => a.usuario.email === email && String(a.matricula) !== String(matricula));
+    if (emailJaCadastrado) {
+        return res.status(400).json({ mensagem: 'O E-mail informado já pertence a outro aluno!' });
+    }
+    aluno.turma = turma;   
+
+    aluno.usuario = { 
+        nome, 
+        cpf, 
+        data_nascimento, 
+        telefone, 
+        email, 
+        senha 
+    };
+
+    return res.status(204).send();
+};
+
 module.exports = {
     listarAlunos,
-    criarAluno
+    criarAluno,
+    atualizarAluno
 }
