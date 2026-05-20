@@ -46,41 +46,35 @@ const listarAlunos = (req, res) => {
 
 const atualizarAluno = (req, res) => {
     const { matricula } = req.params;
-    const { nome, cpf, data_nascimento, telefone, email, senha, turma } = req.body;
-  
-    
-    if (!nome || !cpf || !data_nascimento || !telefone || !email || !senha || !turma) {
+
+    const { nome, cpf, data_nascimento, telefone, email, senha } = req.body;
+
+    if (!nome || !cpf || !data_nascimento || !telefone || !email || !senha) {
         return res.status(400).json({ mensagem: 'Todos os campos são obrigatórios!' });
     }
 
-    
-    const aluno = bancodedados.alunos.find((a) => String(a.matricula) === String(matricula));
+    const aluno = alunos.find((a) => String(a.id) === String(matricula));
     if (!aluno) {
         return res.status(404).json({ mensagem: 'Aluno não encontrado!' });
     }
 
-    
-    const cpfJaCadastrado = bancodedados.alunos.some((a) => a.usuario.cpf === cpf && String(a.matricula) !== String(matricula));
+    const cpfJaCadastrado = alunos.some((a) => a.cpf === cpf && String(a.id) !== String(matricula));
     if (cpfJaCadastrado) {
         return res.status(400).json({ mensagem: 'O CPF informado já pertence a outro aluno!' });
     }
 
-    
-    const emailJaCadastrado = bancodedados.alunos.some((a) => a.usuario.email === email && String(a.matricula) !== String(matricula));
+    const emailJaCadastrado = alunos.some((a) => a.email === email && String(a.id) !== String(matricula));
     if (emailJaCadastrado) {
         return res.status(400).json({ mensagem: 'O E-mail informado já pertence a outro aluno!' });
     }
-    aluno.turma = turma;   
-
-    aluno.usuario = { 
-        nome, 
-        cpf, 
-        data_nascimento, 
-        telefone, 
-        email, 
-        senha 
-    };
-
+        
+    aluno.nome = nome;
+    aluno.cpf = cpf;
+    aluno.data_nascimento = data_nascimento;
+    aluno.telefone = telefone;
+    aluno.email = email;
+    aluno.senha = senha;
+    
     return res.status(204).send();
 };
 
