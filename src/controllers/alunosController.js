@@ -1,4 +1,6 @@
-const { escola, materias, alunos } = require('../bancodedados/bancodedados');
+const { escola, materias, alunos } = require('../bancodedados');
+const {buscarAlunoPorMatricula} = require('../utils/calculos');
+
 const listarAlunos = (req, res) => {
     const {senha_escola}= req.query;
     if(!senha_escola){
@@ -9,10 +11,9 @@ const listarAlunos = (req, res) => {
     }
      
     return res.status(201).json(alunos);
-  }
+  };
   
- const criarAluno = (req,res)=>{
-     
+ const criarAluno = (req,res)=>{     
 
     const {nome,cpf,data_nascimento,telefone,email,senha,turma}=req.body;
 
@@ -45,6 +46,7 @@ const listarAlunos = (req, res) => {
 };
 
 const atualizarAluno = (req, res) => {
+
     const { matricula } = req.params;
 
     const { nome, cpf, data_nascimento, telefone, email, senha } = req.body;
@@ -53,7 +55,7 @@ const atualizarAluno = (req, res) => {
         return res.status(400).json({ mensagem: 'Todos os campos são obrigatórios!' });
     }
 
-    const aluno = alunos.find((a) => String(a.id) === String(matricula));
+    buscarAlunoPorMatricula(matricula);
     if (!aluno) {
         return res.status(404).json({ mensagem: 'Aluno não encontrado!' });
     }
@@ -78,8 +80,20 @@ const atualizarAluno = (req, res) => {
     return res.status(204).send();
 };
 
+const deletarAluno = (req, res) => {
+    const { matricula } = req.params;
+    const aluno = buscarAlunoPorMatricula(matricula);
+
+    if (!aluno) {
+        return res.status(404).json({ mensagem: 'Aluno não encontrado!' });
+    }
+    // Fazer primeiro as funçoes de  notas e faltas porque precisa para depois verificar se o aluno tem notas ou faltas registradas, se tiver não pode ser excluído.
+     res.status(204).send();
+
+};
 module.exports = {
     listarAlunos,
     criarAluno,
-    atualizarAluno
+    atualizarAluno,
+    deletarAluno
 }
