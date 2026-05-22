@@ -7,10 +7,11 @@ const listarAlunos = (req, res) => {
     return res.status(400).json({mensagem:'A senha é obrigatória!'});
     }
     if(senha_escola !== escola.senha){
-    return res.status(400).json({mgitensagem:'A senha da escola informada é inválida!'});
+    return res.status(400).json({mensagem:'A senha da escola informada é inválida!'});
     }
      
-    return res.status(201).json(alunos);
+    return res.status(200).json(alunos);
+
   };
   
  const criarAluno = (req,res)=>{     
@@ -21,28 +22,29 @@ const listarAlunos = (req, res) => {
         return res.status(400).json({mensagem:'Todos os campos são obrigatórios!'});
     }
     
-    const buscaCpfAluno = alunos.find((aluno) => aluno.cpf === cpf);
+    const buscaCpfAluno = alunos.find((aluno) => aluno.usuario.cpf === cpf);
     if(buscaCpfAluno){
         return res.status(400).json({mensagem:'O CPF informado já está cadastrado!'});
     }
-    const buscaEmailAluno = alunos.find((aluno) => aluno.email === email);
+    const buscaEmailAluno = alunos.find((aluno) => aluno.usuario.email === email);
     if(buscaEmailAluno){
         return res.status(400).json({mensagem:'O E-mail informado já está cadastrado!'});
     }
     
     const novoAluno = {
-        id: alunos.length + 1,
+    matricula: alunos.length + 1,
+    turma,
+    usuario: {
         nome,
         cpf,
         data_nascimento,
         telefone,
         email,
-        senha,
-        turma
-    };
+        senha
+    }
+};
     alunos.push(novoAluno);
-
-    return res.status(201).json({mensagem:'Aluno criado com sucesso!'});
+    return res.status(201).send();
 };
 
 const atualizarAluno = (req, res) => {
@@ -55,27 +57,22 @@ const atualizarAluno = (req, res) => {
         return res.status(400).json({ mensagem: 'Todos os campos são obrigatórios!' });
     }
 
-    buscarAlunoPorMatricula(matricula);
+    const aluno = buscarAlunoPorMatricula(matricula);
     if (!aluno) {
         return res.status(404).json({ mensagem: 'Aluno não encontrado!' });
     }
 
-    const cpfJaCadastrado = alunos.some((a) => a.cpf === cpf && String(a.id) !== String(matricula));
+    const cpfJaCadastrado = alunos.some((a) => a.usuario.cpf === cpf && String(a.matricula) !== String(matricula));
     if (cpfJaCadastrado) {
         return res.status(400).json({ mensagem: 'O CPF informado já pertence a outro aluno!' });
     }
 
-    const emailJaCadastrado = alunos.some((a) => a.email === email && String(a.id) !== String(matricula));
+    const emailJaCadastrado = alunos.some((a) => a.usuario.email === email && String(a.matricula) !== String(matricula));
     if (emailJaCadastrado) {
         return res.status(400).json({ mensagem: 'O E-mail informado já pertence a outro aluno!' });
-    }
-        
-    aluno.nome = nome;
-    aluno.cpf = cpf;
-    aluno.data_nascimento = data_nascimento;
-    aluno.telefone = telefone;
-    aluno.email = email;
-    aluno.senha = senha;
+    }     
+     
+    aluno.usuario = { nome, cpf, data_nascimento, telefone, email, senha };
     
     return res.status(204).send();
 };
