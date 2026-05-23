@@ -94,18 +94,99 @@ const transferirAluno = (req,res)=>{
     
 }
 
-   
+const consultarSituacaoPorMateria = (req,res)=>{
+    const { matricula, senha } = req.query;
+    if (!matricula || !senha) {
+        return res.status(400).json({ mensagem: 'Matricula e senha são obrigatórios!' });
+    }
+    const aluno = buscarAlunoPorMatricula(matricula);
+
+    if (!aluno) {
+        return res.status(404).json({ mensagem: 'Aluno não encontrado!' });
+    }
+    if (aluno.usuario.senha !== senha) {
+        return res.status(401).json({ mensagem: 'Senha inválida!' });
+    }
+
+    const situacao_por_materia = materias.map(materia => {
+        const notasAluno = notas.filter(nota => nota.matricula === matricula && nota.materia === materia);
+        const faltasAluno = faltas.filter(falta => falta.matricula === matricula && falta.materia === materia); 
+
+        const media = notasAluno.length > 0 ? notasAluno.reduce((acc, nota) => acc + nota.valor, 0) / notasAluno.length : null;
+        const total_faltas = faltasAluno.length;       
+        let situacao = 'Sem registros';
+
+        if (media !== null) {
+            if (media >= 7 && total_faltas <= 10) {
+                situacao = 'Aprovado';
+            } else if (total_faltas > 10) {
+                situacao = 'Reprovado por falta';
+            } else {
+                situacao = 'Reprovado';
+            }
+                }
+        return {
+            materia,
+            media,                  
+            total_faltas,                                               
+            situacao
+        };
+    }); 
+    return res.status(200).json({ situacao_por_materia });
+}
 
 
  
+// ```javascript
+// // HTTP 200
+// {
+//     "situacao_por_materia": [
+//         {
+//             "materia": "Matemática",
+//             "media": 8.5,
+//             "total_faltas": 2,
+//             "situacao": "Aprovado"
+//         },
+//         {
+//             "materia": "Português",
+//             "media": 5.0,
+//             "total_faltas": 3,
+//             "situacao": "Reprovado"
+//         },
+//         {
+//             "materia": "História",
+//             "media": 7.0,
+//             "total_faltas": 11,
+//             "situacao": "Reprovado por falta"
+//         },
+//         {
+//             "materia": "Geografia",
+//             "media": null,
+//             "total_faltas": 0,
+//             "situacao": "Sem registros"
+//         }
+//     ]
+// }
+// ```
 
- 
+// > Matérias sem nenhuma nota registrada devem aparecer com `media: null` e `situacao: "Sem registros"`.
 
- 
+// **Resposta (erro):**
+
+// ```javascript
+// // HTTP 401
+// {
+//     "mensagem": "Senha inválida!"
+// }
+// ```
+
+// ---
+
  
  module.exports = {
     inserNotas,
     registrarFaltas,
-    transferirAluno
+    transferirAluno,
+    consultarSituacaoPorMateria
 
 }
