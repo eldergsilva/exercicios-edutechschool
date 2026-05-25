@@ -17,7 +17,10 @@ const inserNotas = (req, res) => {
     if (typeof valor !== 'number' || valor < 0 || valor > 10) {
         return res.status(400).json({ mensagem: 'A nota deve ser um número entre 0 e 10!' });
     }
-    const novaNota = { data: new Date().toLocaleString('pt-BR'), matricula, materia, valor };
+    const novaNota = { 
+        data: new Date().toLocaleString('pt-BR'), 
+        matricula, materia, 
+        valor };
     notas.push(novaNota);
     return res.status(201).send();
 };
@@ -35,7 +38,11 @@ const registrarFaltas = (req, res) => {
     if (!materiaValida) {
         return res.status(400).json({ mensagem: 'Matéria inválida! Consulte as matérias disponíveis.' });
     }
-    const novaFalta = { data: new Date().toLocaleString('pt-BR'), matricula, materia };
+    const novaFalta = { 
+        data: new Date().toLocaleString('pt-BR'), 
+        matricula, 
+        materia 
+    };
     faltas.push(novaFalta);
     return res.status(201).send();
 };
@@ -58,7 +65,13 @@ const transferirAluno = (req, res) => {
     if (turma_origem === turma_destino) {
         return res.status(400).json({ mensagem: 'As turmas de origem e destino não podem ser iguais!' });
     }
-    const novaTransferencia = { data: new Date().toLocaleString('pt-BR'), matricula, turma_origem, turma_destino };
+    const novaTransferencia = { 
+        data: new Date().toLocaleString('pt-BR'), 
+        matricula, 
+        turma_origem, 
+        turma_destino 
+    };
+
     transferencias.push(novaTransferencia);
     aluno.turma = turma_destino;
     return res.status(204).send();
@@ -101,10 +114,38 @@ const consultarAprovacaoDeAno = (req, res) => {
     return res.status(200).json({ resultado, materiasAprovadas, materiasReprovadas });
 };
 
+    const boletim=(req,res)=>{
+
+    const { matricula, senha } = req.query;
+    if (!matricula || !senha) {
+        return res.status(400).json({ mensagem: 'Matricula e senha são obrigatórios!' });
+    }
+    const aluno = buscarAlunoPorMatricula(matricula);
+    if (!aluno) {
+        return res.status(404).json({ mensagem: 'Aluno não encontrado!' });
+    }
+    if (aluno.usuario.senha !== senha) {
+        return res.status(401).json({ mensagem: 'Senha inválida!' });
+    } 
+    
+    const notasAluno = notas.filter(nota => String(nota.matricula) === String(matricula));
+    const faltasAluno = faltas.filter(falta => String(falta.matricula) === String(matricula));
+    const transferenciasAluno = transferencias.filter(t => String(t.matricula) === String(matricula));
+
+     return res.status(200).json({
+    notas: notasAluno,
+    faltas: faltasAluno,
+    transferencias: transferenciasAluno
+     });
+    return res.status(200).json({listaDeTransferencia});
+     }
+
 module.exports = {
     inserNotas,
     registrarFaltas,
     transferirAluno,
     consultarSituacaoPorMateria,
-    consultarAprovacaoDeAno
+    consultarAprovacaoDeAno,
+    boletim
+    
 };
