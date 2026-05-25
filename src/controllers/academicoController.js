@@ -132,12 +132,12 @@ const consultarAprovacaoDeAno = (req, res) => {
     const faltasAluno = faltas.filter(falta => String(falta.matricula) === String(matricula));
     const transferenciasAluno = transferencias.filter(t => String(t.matricula) === String(matricula));
 
-     return res.status(200).json({
+    return res.status(200).json({
     notas: notasAluno,
     faltas: faltasAluno,
     transferencias: transferenciasAluno
-     });
-    return res.status(200).json({listaDeTransferencia});
+      });
+    
      }
 
 module.exports = {
