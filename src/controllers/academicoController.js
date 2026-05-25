@@ -1,5 +1,6 @@
- const {buscarAlunoPorMatricula,buscarMateriaValida} = require('../utils/calculos');
- const { alunos, notas, escola,transferencias } = require('../bancodedados');
+const { buscarAlunoPorMatricula, buscarMateriaValida, calcularSituacaoPorMateria } = require('../utils/calculos');
+const { alunos, notas, faltas, escola, materias, transferencias } = require('../bancodedados');
+
 
 const inserNotas = (req,res)=>{
  const { matricula, materia, valor } = req.body;
@@ -94,6 +95,17 @@ const transferirAluno = (req,res)=>{
     
 }
 
+
+const calcularSituacaoPorMateria = (matricula) => {
+    return materias.map(materia => {
+        const notasAluno = notas.filter(nota => nota.matricula === matricula && nota.materia === materia);
+        const faltasAluno = faltas.filter(falta => falta.matricula === matricula && falta.materia === materia);
+
+         // JUSTAR IMPORTAÇÂO DE CALCULO !!!
+        return { materia, media, totalFaltas, situacao };
+    });
+};
+
 const consultarSituacaoPorMateria = (req,res)=>{
     const { matricula, senha } = req.query;
     if (!matricula || !senha) {
@@ -108,35 +120,14 @@ const consultarSituacaoPorMateria = (req,res)=>{
         return res.status(401).json({ mensagem: 'Senha inválida!' });
     }
 
-    const situacao_por_materia = materias.map(materia => {
-        const notasAluno = notas.filter(nota => nota.matricula === matricula && nota.materia === materia);
-        const faltasAluno = faltas.filter(falta => falta.matricula === matricula && falta.materia === materia); 
+    // JUSTAR IMPORTAÇÂO DE CALCULO !!!
 
-        const media = notasAluno.length > 0 ? notasAluno.reduce((acc, nota) => acc + nota.valor, 0) / notasAluno.length : null;
-        const total_faltas = faltasAluno.length;       
-        let situacao = 'Sem registros';
-
-        if (media !== null) {
-            if (media >= 6 && total_faltas <= 10) {
-                situacao = 'Aprovado';
-            } else if (total_faltas > 10) {
-                situacao = 'Reprovado por falta';
-            } else {
-                situacao = 'Reprovado';
-            }
-                }
-        return {
-            materia,
-            media,                  
-            total_faltas,                                               
-            situacao
-        };
-    }); 
-    return res.status(200).json({ situacao_por_materia });
+    return res.status(200).json({ situacaoPorMateria });
 }
 
 const consultarAprovacaoDeAno=(req,res)=>{
     const { matricula, senha } = req.query;
+
     if (!matricula || !senha) {
         return res.status(400).json({ mensagem: 'Matricula e senha são obrigatórios!' });
     }
@@ -148,12 +139,40 @@ const consultarAprovacaoDeAno=(req,res)=>{
     if (aluno.usuario.senha !== senha) {
         return res.status(401).json({ mensagem: 'Senha inválida!' });
     }
-    return res.status(200).json({mensagem:"consultarAprovacaoDeAno rodando !."})
+
+    // JUSTAR IMPORTAÇÂO DE CALCULO !!!
+    
+    const novoResultadoFinal ={
+    resultado,
+    materiasAprovadas,
+    materiasAprovadas
+    }
+    
+    return res.status(200).json({novoResultadoFinal})
+
 }
 
+   
+
+
+
  
+ /*  AS NOTAS ESTÂO EM inserNotas(
+ const novaNota = { data: new Date().toLocaleString('pt-BR'), matricula, materia,valor }; notas.push(novaNota);
+ Dessa forma preciso percorrer o array de notas e verificar onde o aluno da matricula em questão esta mencionado e ir acumulando pra  ver se :
+- Aprovado em todas → `"Aprovado"`
+- Reprovado em 1 ou 2 matérias → `"Recuperação"`
+- Reprovado em 3 ou mais → `"Reprovado"`
+dai retorno a situação de aprvado ou não junto com os resultados 
+ 
+{
+    "resultado": RESOLTADO TOTAL ,
+    "materias_reprovadas": [ARRAY DAS REPROVADAS ],
+    "materias_aprovadas": [ARRAY DAS APROVADAS ]
+}
  
 
+*/
  
  module.exports = {
     inserNotas,
