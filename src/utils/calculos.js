@@ -12,7 +12,11 @@ const calcularSituacaoPorMateria = (matricula) => {
     return materias.map(materia => {
         const notasAluno = notas.filter(nota => nota.matricula === matricula && nota.materia === materia);
         const faltasAluno = faltas.filter(falta => falta.matricula === matricula && falta.materia === materia);
-        const media = notasAluno.length > 0 ? notasAluno.reduce((acc, nota) => acc + nota.valor, 0) / notasAluno.length : null;
+
+        const media = notasAluno.length > 0 ? 
+        notasAluno.reduce((acc, nota) => acc + nota.valor, 0) / notasAluno.length 
+        : null;
+
         const total_faltas = faltasAluno.length;
         let situacao = 'Sem registros';
         if (media !== null) {

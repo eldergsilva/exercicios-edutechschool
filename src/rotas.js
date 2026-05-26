@@ -1,10 +1,10 @@
 const express = require('express');
-const { listarAlunos, criarAluno, atualizarAluno, deletarAluno } = require('./controllers/alunosController');
+const { listarAlunos, cadastrarAluno, atualizarAluno, deletarAluno } = require('./controllers/alunosController');
 const { inserNotas,registrarFaltas,transferirAluno,consultarSituacaoPorMateria,consultarAprovacaoDeAno, boletim } = require('./controllers/academicoController');
 const rotas = express.Router();
 
 rotas.get('/alunos', listarAlunos);
-rotas.post('/alunos',criarAluno);
+rotas.post('/alunos',cadastrarAluno);
 rotas.put('/alunos/:matricula/usuario',atualizarAluno);
 rotas.delete('/alunos/:matricula',deletarAluno); 
 

@@ -7,14 +7,14 @@ const listarAlunos = (req, res) => {
     return res.status(400).json({mensagem:'A senha é obrigatória!'});
     }
     if(senha_escola !== escola.senha){
-    return res.status(400).json({mensagem:'A senha da escola informada é inválida!'});
+    return res.status(403).json({mensagem:'A senha da escola informada é inválida!'});
     }
      
     return res.status(200).json(alunos);
 
   };
   
- const criarAluno = (req,res)=>{     
+ const cadastrarAluno = (req,res)=>{     
 
     const {nome,cpf,data_nascimento,telefone,email,senha,turma}=req.body;
 
@@ -103,7 +103,7 @@ const deletarAluno = (req, res) => {
 };
 module.exports = {
     listarAlunos,
-    criarAluno,
+    cadastrarAluno,
     atualizarAluno,
     deletarAluno
 }
